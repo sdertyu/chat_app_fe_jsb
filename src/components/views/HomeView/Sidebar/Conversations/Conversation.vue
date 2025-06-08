@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import type { IAttachment, IConversation, IRecording } from "@/types";
 import type { Ref } from "vue";
-import { computed, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 
 import useStore from "@/stores/store";
 import {
-  getActiveConversationId,
+
   getAvatar,
   getConversationIndex,
   getName,
@@ -13,6 +13,7 @@ import {
   shorten,
 } from "@/utils";
 import router from "@/router";
+import { useRoute } from "vue-router";
 
 import {
   ArchiveBoxArrowDownIcon,
@@ -20,14 +21,17 @@ import {
   MicrophoneIcon,
   TrashIcon,
 } from "@heroicons/vue/24/outline";
+
 import Dropdown from "@/components/ui/navigation/Dropdown/Dropdown.vue";
-import DropdownLink from "@/components/ui/navigation/Dropdown/DropdownLink.vue";
 
 const props = defineProps<{
   conversation: IConversation;
 }>();
 
-const activeConversationId = getActiveConversationId();
+const route = useRoute();
+const activeConversationId = computed(() =>
+  route.params.id ? Number(route.params.id) : undefined,
+);
 
 const store = useStore();
 
@@ -77,8 +81,12 @@ const handleRemoveUnread = () => {
 
 // (computed property) determines if this conversation is active.
 const isActive = computed(
-  () => activeConversationId === props.conversation.id,
+  () => activeConversationId.value == props.conversation.id,
 );
+
+onMounted(() => {
+
+});
 </script>
 
 <template>
@@ -125,7 +133,7 @@ const isActive = computed(
             <!--draft Message-->
             <p v-if="
               props.conversation.draftMessage &&
-              props.conversation.id !== activeConversationId
+              props.conversation.id != activeConversationId
             " class="body-2 flex justify-start items-center text-red-400">
               draft: {{ shorten(props.conversation.draftMessage) }}
             </p>

@@ -60,13 +60,25 @@ export const joinUserRoom = (func?: (payload: any) => void) => {
   }
 }
 
-export const joinRoom = (roomId: string) => {
+export const joinRoom = (roomId: string, func?: (payload: any) => void) => {
   if (stompClient && stompClient.connected) {
     currentSubscription = stompClient.subscribe(`/topic/room/${roomId}`, (message) => {
       const payload = JSON.parse(message.body)
-      console.log(`Tin nhắn từ phòng ${roomId}:`, payload)
-      // onMessage(payload)
+      if (func) {
+        func(payload)
+      }
     })
+  }
+}
+
+export const typing = (destination: string, body: any) => {
+  if (stompClient && stompClient.connected) {
+    stompClient.publish({
+      destination: destination,
+      body: JSON.stringify(body),
+    })
+  } else {
+    console.warn('[STOMP] Không thể gửi thông báo gõ chữ vì chưa kết nối')
   }
 }
 

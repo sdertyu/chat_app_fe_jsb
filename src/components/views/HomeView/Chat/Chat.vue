@@ -99,54 +99,20 @@ const join_room = () => {
   // if (socket && activeConversationId) {
   //     socket.emit('join_room', { conversationId: String(activeConversationId) })
   // }
-  joinRoom(String(activeConversationId));
+  joinRoom(String(activeConversationId),
+    (payload: any) => {
+      if (payload.conversationId == activeConversationId && payload.senderId != store.user?.id) {
+        store.isTyping = true
+        setTimeout(() => {
+          store.isTyping = false
+        }, 3000)
+      }
+    }
+  );
 };
 
 onMounted(() => {
   join_room();
-
-  // const socket = getSocket()
-  // if (socket) {
-  //     socket.on('receive_message', async (message) => {
-  //         const chat = store.conversations.find((c) => c.id == message.conversationId)
-  //         if (chat) {
-  //             const sender = chat.contacts.find((c) => c.id === message.senderId)
-  //             if (sender)
-  //                 chat.messages.push({
-  //                     id: message.id,
-  //                     type: 'text',
-  //                     content: message.content,
-  //                     date: message.createdAt,
-  //                     sender: {
-  //                         id: sender.id,
-  //                         firstName: sender.firstName,
-  //                         lastName: sender.lastName,
-  //                         avatar: sender.avatar,
-  //                         email: sender.email,
-  //                         lastSeen: new Date(),
-  //                         lastReadMessageId: message.id
-  //                     },
-  //                     state: 'unread',
-  //                 })
-
-  //             store.isTyping = false
-  //             nextTick(() => {
-  //                 scrollToBottom()
-  //             })
-  //         } else {
-  //             try {
-  //                 const newChat = await axios.get(`/chat/conversations/${message.conversationId}`)
-  //                 if (newChat.status === 200) {
-  //                     const chatData = newChat.data
-  //                     store.addConversation(chatData)
-  //                 }
-  //             } catch (error) {
-  //                 console.error('Error fetching chat:', error)
-  //             }
-  //         }
-  //         console.log(message)
-  //     })
-  // }
 });
 
 onBeforeUnmount(() => {
@@ -160,22 +126,11 @@ onBeforeUnmount(() => {
 <template>
   <Spinner v-if="store.status === 'loading' || store.delayLoading" />
 
-  <div
-    v-else-if="getActiveConversationId() && activeConversation"
-    class="h-full flex flex-col scrollbar-hidden"
-  >
-    <ChatTop
-      :select-all="selectAll"
-      :select-mode="selectMode"
-      :handle-select-all="handleSelectAll"
-      :handle-deselect-all="handleDeselectAll"
-      :handle-close-select="handleCloseSelect"
-    />
-    <ChatMiddle
-      :selected-messages="selectedMessages"
-      :handle-select-message="handleSelectMessage"
-      :handle-deselect-message="handleDeselectMessage"
-    />
+  <div v-else-if="getActiveConversationId() && activeConversation" class="h-full flex flex-col scrollbar-hidden">
+    <ChatTop :select-all="selectAll" :select-mode="selectMode" :handle-select-all="handleSelectAll"
+      :handle-deselect-all="handleDeselectAll" :handle-close-select="handleCloseSelect" />
+    <ChatMiddle :selected-messages="selectedMessages" :handle-select-message="handleSelectMessage"
+      :handle-deselect-message="handleDeselectMessage" />
     <ChatTyping v-if="store.isTyping" />
 
     <ChatBottom />

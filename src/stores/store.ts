@@ -87,7 +87,7 @@ const useStore = defineStore('chat', () => {
       const response = await axios.get('/chat/conversations')
       if (response.status === 200) {
         conversations.value = response.data.data.map((conversation: any): IConversation => {
-          console.log(conversation)
+          // console.log(conversation)
           return {
             id: conversation.id,
             type: conversation.type || 'group',

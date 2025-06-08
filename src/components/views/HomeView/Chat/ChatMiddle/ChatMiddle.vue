@@ -24,8 +24,8 @@ const isFollowUp = (index: number, previousIndex: number): boolean => {
   if (previousIndex < 0) {
     return false;
   } else {
-    let previousSender = activeConversation.messages[previousIndex].sender.id;
-    let currentSender = activeConversation.messages[index].sender.id;
+    const previousSender = activeConversation.messages[previousIndex].sender.id;
+    const currentSender = activeConversation.messages[index].sender.id;
     return previousSender === currentSender;
   }
 };
@@ -68,7 +68,7 @@ onMounted(() => {
   scrollToBottom();
   emitter.on("scrollToBottom", scrollToBottom);
 
-  console.log(activeConversation.contacts.map((c) => c.lastReadMessageId));
+  // console.log(activeConversation.contacts.map((c) => c.lastReadMessageId));
 });
 
 onUnmounted(() => {
